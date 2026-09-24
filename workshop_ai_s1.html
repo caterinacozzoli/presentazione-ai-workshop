@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manuale di sopravvivenza all'AI — Sessione 1</title>
+
+  <!-- === FONTS: Raleway + Lato (JAKALA design system) === -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Raleway:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===========================================
+       VIEWPORT BASE CSS (mandatory — inline)
+       =========================================== */
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+    html {
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+    .slide {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .slide-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-height: 100%;
+      overflow: hidden;
+      padding: var(--slide-padding);
+    }
+    :root {
+      /* === JAKALA Design Tokens === */
+      --blue-dark:    #06006b;
+      --blue-mid:     #040066;
+      --red:          #f00a0a;
+      --grey-light:   #cfcfcf;
+      --white:        #ffffff;
+      --text-on-dark: #ffffff;
+      --text-on-light: #040066;
+
+      /* Typography — clamp() everywhere */
+      --font-heading: 'Raleway', sans-serif;
+      --font-body:    'Lato', sans-serif;
+
+      --title-size:    clamp(2rem, 5.5vw, 5rem);
+      --h2-size:       clamp(1.4rem, 3.2vw, 2.8rem);
+      --h3-size:       clamp(1rem, 2vw, 1.6rem);
+      --body-size:     clamp(0.85rem, 1.4vw, 1.15rem);
+      --small-size:    clamp(0.7rem, 1vw, 0.9rem);
+      --label-size:    clamp(0.65rem, 0.85vw, 0.8rem);
+
+      /* Spacing */
+      --slide-padding: clamp(2rem, 5vw, 5rem);
+      --content-gap:   clamp(0.8rem, 2vw, 2rem);
+      --item-gap:      clamp(0.5rem, 1.2vw, 1.2rem);
+    }
+
+    @media (max-height: 700px) {
+      :root {
+        --slide-padding: clamp(1rem, 3vw, 2.5rem);
+        --title-size:    clamp(1.5rem, 4vw, 3rem);
+        --h2-size:       clamp(1.1rem, 2.5vw, 2rem);
+        --content-gap:   clamp(0.5rem, 1.2vw, 1.2rem);
+      }
+    }
+    @media (max-height: 600px) {
+      :root {
+        --slide-padding: clamp(0.75rem, 2vw, 1.5rem);
+        --title-size:    clamp(1.2rem, 3.5vw, 2.2rem);
+        --h2-size:       clamp(1rem, 2vw, 1.5rem);
+        --body-size:     clamp(0.7rem, 1.1vw, 0.9rem);
+      }
+      .nav-dots, .keyboard-hint { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ===========================================
+       BASE RESET
+       =========================================== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--blue-dark);
+      color: var(--white);
+    }
+
+    /* ===========================================
+       PROGRESS BAR
+       =========================================== */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: var(--red);
+      width: 0%;
+      z-index: 9999;
+      transition: width 0.2s ease;
+    }
+
+    /* ===========================================
+       NAV DOTS
+       =========================================== */
+    .nav-dots {
+      position: fixed;
+      right: clamp(0.75rem, 1.5vw, 1.5rem);
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(5px, 0.8vh, 10px);
+      z-index: 1000;
+    }
+    .nav-dot {
+      width: clamp(6px, 0.5vw, 8px);
+      height: clamp(6px, 0.5vw, 8px);
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .nav-dot.active {
+      background: var(--white);
+      transform: scale(1.4);
+    }
+    /* on light slides */
+    .slide--light ~ nav .nav-dot { background: rgba(4,0,102,0.3); }
+
+    /* ===========================================
+       SLIDE COUNTER (bottom right)
+       =========================================== */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: clamp(0.5rem, 1.2vw, 1rem) var(--slide-padding);
+      font-family: var(--font-heading);
+      font-size: var(--label-size);
+      border-top: 2px solid currentColor;
+    }
+    .slide--dark .slide-footer { color: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.2); }
+    .slide--light .slide-footer { color: var(--blue-mid); border-color: rgba(4,0,102,0.2); }
+
+    /* ===========================================
+       GEOMETRIC DECORATIONS — CSS hexagons
+       =========================================== */
+    .hex {
+      position: absolute;
+      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+      pointer-events: none;
+    }
+    /* Cover / dark slide decorations */
+    .hex--grey-tr {
+      width: clamp(300px, 45vw, 700px);
+      height: clamp(300px, 45vw, 700px);
+      background: var(--grey-light);
+      top: -8%; right: -8%;
+      opacity: 0.9;
+    }
+    .hex--red-br {
+      width: clamp(200px, 35vw, 550px);
+      height: clamp(200px, 35vw, 550px);
+      background: var(--red);
+      bottom: -15%; right: -5%;
+    }
+    .hex--white-center {
+      width: clamp(180px, 25vw, 380px);
+      height: clamp(180px, 25vw, 380px);
+      background: var(--white);
+      bottom: 5%; right: 15%;
+    }
+    /* Light slide decorations */
+    .hex--blue-bl {
+      width: clamp(350px, 50vw, 750px);
+      height: clamp(350px, 50vw, 750px);
+      background: var(--blue-dark);
+      bottom: -20%; left: -12%;
+      opacity: 0.07;
+    }
+
+    /* ===========================================
+       LOGO JAKALA (top right corner)
+       =========================================== */
+    .logo-j {
+      position: absolute;
+      top: clamp(1rem, 2.5vw, 2rem);
+      right: clamp(1rem, 2.5vw, 2rem);
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      color: var(--red);
+      letter-spacing: -1px;
+      z-index: 10;
+      line-height: 1;
+    }
+    .logo-j span { color: var(--white); }
+    .logo-j--dark span { color: var(--white); }
+    .logo-j--light span { color: var(--blue-dark); }
+    .logo-j--light { color: var(--red); }
+
+    /* ===========================================
+       SLIDE TYPE: COVER (Slide 1)
+       =========================================== */
+    .slide--cover {
+      background: var(--blue-dark);
+    }
+    .slide--cover .slide-content {
+      justify-content: flex-end;
+      padding-bottom: clamp(3rem, 7vw, 7rem);
+    }
+    .cover-eyebrow {
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: clamp(0.5rem, 1.2vw, 1.2rem);
+    }
+    .cover-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--title-size);
+      color: var(--white);
+      line-height: 1.1;
+      max-width: clamp(300px, 55vw, 800px);
+      margin-bottom: clamp(0.6rem, 1.5vw, 1.5rem);
+    }
+    .cover-subtitle {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: var(--h3-size);
+      color: rgba(255,255,255,0.8);
+      max-width: clamp(280px, 50vw, 700px);
+      line-height: 1.4;
+    }
+
+    /* ===========================================
+       SLIDE TYPE: AGENDA (Slide 2)
+       =========================================== */
+    .slide--light {
+      background: var(--white);
+    }
+    .agenda-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 100%;
+    }
+    .agenda-left {
+      background: var(--blue-dark);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--slide-padding);
+      position: relative;
+      overflow: hidden;
+    }
+    .agenda-left-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--title-size);
+      color: var(--white);
+      line-height: 1.1;
+    }
+    .agenda-left-sub {
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      color: rgba(255,255,255,0.6);
+      margin-top: clamp(0.5rem, 1vw, 1rem);
+    }
+    .agenda-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--slide-padding);
+      gap: var(--item-gap);
+      position: relative;
+    }
+    .agenda-item {
+      display: flex;
+      align-items: flex-start;
+      gap: clamp(0.75rem, 1.5vw, 1.5rem);
+    }
+    .agenda-bullet {
+      width: clamp(22px, 2vw, 32px);
+      height: clamp(22px, 2vw, 32px);
+      min-width: clamp(22px, 2vw, 32px);
+      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+      background: var(--red);
+      margin-top: 2px;
+    }
+    .agenda-item-text {
+      font-family: var(--font-heading);
+      font-weight: 400;
+      font-size: var(--h3-size);
+      color: var(--blue-mid);
+      line-height: 1.3;
+    }
+    .agenda-item-text strong {
+      display: block;
+      font-weight: 700;
+      color: var(--blue-dark);
+    }
+
+    /* ===========================================
+       SLIDE TYPE: SECTION HEADER
+       =========================================== */
+    .slide--section {
+      background: var(--blue-dark);
+    }
+    .section-number {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: clamp(4rem, 15vw, 14rem);
+      color: rgba(255,255,255,0.06);
+      position: absolute;
+      bottom: -2rem; left: -1rem;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+    .section-label {
+      font-family: var(--font-body);
+      font-size: var(--small-size);
+      color: var(--red);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: clamp(0.5rem, 1.2vw, 1.2rem);
+    }
+    .section-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--title-size);
+      color: var(--white);
+      line-height: 1.1;
+      max-width: clamp(300px, 60vw, 850px);
+    }
+    .section-desc {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: var(--h3-size);
+      color: rgba(255,255,255,0.7);
+      margin-top: clamp(0.6rem, 1.5vw, 1.5rem);
+      max-width: clamp(280px, 50vw, 650px);
+      line-height: 1.5;
+    }
+
+    /* ===========================================
+       SLIDE TYPE: DARK CONTENT
+       =========================================== */
+    .slide--dark {
+      background: var(--blue-dark);
+    }
+    .content-label {
+      font-family: var(--font-body);
+      font-size: var(--small-size);
+      color: var(--red);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: clamp(0.4rem, 1vw, 1rem);
+    }
+    .content-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--h2-size);
+      color: var(--white);
+      line-height: 1.15;
+      max-width: clamp(280px, 65vw, 900px);
+      margin-bottom: var(--content-gap);
+    }
+    .content-subtitle {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: var(--body-size);
+      color: rgba(255,255,255,0.7);
+      line-height: 1.6;
+      max-width: clamp(280px, 60vw, 750px);
+      margin-bottom: var(--content-gap);
+    }
+
+    /* Two-column layout */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(1.5rem, 3vw, 4rem);
+      align-items: start;
+    }
+
+    /* Bullet list */
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--item-gap);
+    }
+    .bullet-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: clamp(0.6rem, 1.2vw, 1.2rem);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      color: rgba(255,255,255,0.85);
+      line-height: 1.5;
+    }
+    .bullet-list li::before {
+      content: '';
+      display: block;
+      min-width: clamp(12px, 1.2vw, 18px);
+      height: clamp(12px, 1.2vw, 18px);
+      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+      background: var(--red);
+      margin-top: 3px;
+      flex-shrink: 0;
+    }
+    .bullet-list li strong { color: var(--white); font-weight: 700; }
+
+    /* Light bullet list */
+    .bullet-list--light li { color: rgba(4,0,102,0.8); }
+    .bullet-list--light li strong { color: var(--blue-dark); }
+
+    /* Format table */
+    .format-table {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.4rem, 0.8vw, 0.8rem);
+    }
+    .format-row {
+      display: flex;
+      align-items: center;
+      gap: clamp(0.6rem, 1.5vw, 1.5rem);
+      padding: clamp(0.4rem, 0.8vw, 0.8rem) clamp(0.6rem, 1.2vw, 1.2rem);
+      border-radius: 6px;
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+    }
+    .format-row--ok   { background: rgba(0,200,100,0.15); border-left: 3px solid #00c864; }
+    .format-row--warn { background: rgba(255,181,71,0.15); border-left: 3px solid #ffb547; }
+    .format-row--bad  { background: rgba(240,10,10,0.12);  border-left: 3px solid var(--red); }
+    .format-tag {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--small-size);
+      min-width: clamp(50px, 6vw, 90px);
+      color: var(--white);
+    }
+    .format-desc { color: rgba(255,255,255,0.75); }
+
+    /* ===========================================
+       SLIDE TYPE: QUIZ
+       =========================================== */
+    .slide--quiz {
+      background: var(--blue-dark);
+    }
+    .quiz-question {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--h2-size);
+      color: var(--white);
+      line-height: 1.2;
+      max-width: clamp(300px, 70vw, 900px);
+      margin-bottom: var(--content-gap);
+    }
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.5rem, 1.2vw, 1.2rem);
+      max-width: clamp(300px, 65vw, 850px);
+    }
+    .quiz-opt {
+      display: flex;
+      align-items: center;
+      gap: clamp(0.75rem, 1.5vw, 1.5rem);
+      padding: clamp(0.6rem, 1.2vw, 1.2rem) clamp(1rem, 2vw, 2rem);
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      color: rgba(255,255,255,0.85);
+      line-height: 1.4;
+    }
+    .quiz-letter {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--h3-size);
+      color: var(--red);
+      min-width: clamp(1.4rem, 2vw, 2rem);
+    }
+
+    /* ===========================================
+       SLIDE TYPE: PROMPT COMPARE
+       =========================================== */
+    .prompt-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(1rem, 2.5vw, 3rem);
+      align-items: start;
+    }
+    .prompt-box {
+      padding: clamp(0.8rem, 1.5vw, 1.5rem);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.4rem, 0.8vw, 0.8rem);
+    }
+    .prompt-box--bad  { background: rgba(240,10,10,0.1);  border: 1.5px solid rgba(240,10,10,0.4); }
+    .prompt-box--good { background: rgba(0,200,100,0.1);  border: 1.5px solid rgba(0,200,100,0.4); }
+    .prompt-box-label {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--small-size);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .prompt-box--bad  .prompt-box-label { color: #ff6b6b; }
+    .prompt-box--good .prompt-box-label { color: #00c864; }
+    .prompt-code {
+      font-family: 'Courier New', monospace;
+      font-size: var(--small-size);
+      color: rgba(255,255,255,0.85);
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .prompt-result {
+      font-family: var(--font-body);
+      font-size: var(--small-size);
+      color: rgba(255,255,255,0.55);
+      font-style: italic;
+      line-height: 1.4;
+    }
+
+    /* ===========================================
+       SLIDE TYPE: EXERCISE
+       =========================================== */
+    .slide--exercise {
+      background: #050042;
+    }
+    .exercise-number {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: clamp(3rem, 10vw, 9rem);
+      color: rgba(240,10,10,0.15);
+      position: absolute;
+      bottom: -1rem; right: -0.5rem;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .exercise-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--red);
+      color: var(--white);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--small-size);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: clamp(0.25rem, 0.6vw, 0.5rem) clamp(0.6rem, 1.2vw, 1rem);
+      border-radius: 4px;
+      margin-bottom: clamp(0.6rem, 1.2vw, 1.2rem);
+    }
+    .exercise-timer {
+      margin-top: clamp(1rem, 2vw, 2rem);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--h3-size);
+      color: rgba(255,255,255,0.4);
+    }
+    .exercise-timer span { color: var(--red); }
+
+    /* ===========================================
+       SLIDE TYPE: VIDEO
+       =========================================== */
+    .slide--video {
+      background: #020020;
+    }
+    .video-frame {
+      width: min(90vw, 860px);
+      aspect-ratio: 16/9;
+      border-radius: 10px;
+      border: 2px solid rgba(255,255,255,0.12);
+      overflow: hidden;
+      position: relative;
+      background: #000;
+    }
+    .video-frame iframe {
+      width: 100%; height: 100%;
+      border: none;
+    }
+
+    /* ===========================================
+       SLIDE TYPE: LINKS / RESOURCES
+       =========================================== */
+    .slide--links {
+      background: var(--white);
+    }
+    .links-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(0.5rem, 1.2vw, 1.2rem);
+    }
+    .link-card {
+      padding: clamp(0.6rem, 1.2vw, 1.2rem) clamp(0.8rem, 1.5vw, 1.5rem);
+      border-radius: 8px;
+      border: 1.5px solid rgba(4,0,102,0.12);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.2rem, 0.5vw, 0.5rem);
+    }
+    .link-tag {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--red);
+    }
+    .link-title {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: var(--small-size);
+      color: var(--blue-dark);
+      line-height: 1.3;
+    }
+    .link-url {
+      font-family: 'Courier New', monospace;
+      font-size: var(--label-size);
+      color: rgba(4,0,102,0.5);
+      word-break: break-all;
+    }
+
+    /* ===========================================
+       SLIDE TYPE: THANKS (last slide)
+       =========================================== */
+    .slide--thanks {
+      background: var(--blue-dark);
+    }
+    .thanks-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--title-size);
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: clamp(0.6rem, 1.5vw, 1.5rem);
+    }
+    .thanks-sub {
+      font-family: var(--font-body);
+      font-size: var(--h3-size);
+      color: rgba(255,255,255,0.65);
+      margin-bottom: clamp(1rem, 2vw, 2rem);
+    }
+    .oratori-row {
+      display: flex;
+      gap: clamp(1.5rem, 3vw, 3rem);
+      flex-wrap: wrap;
+    }
+    .oratore {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: var(--body-size);
+      color: rgba(255,255,255,0.8);
+    }
+    .oratore span { color: var(--red); margin-right: 0.3em; }
+
+    /* ===========================================
+       PLACEHOLDER BADGE
+       =========================================== */
+    .placeholder {
+      display: inline-block;
+      background: rgba(255,181,71,0.2);
+      border: 1.5px dashed #ffb547;
+      border-radius: 6px;
+      padding: clamp(0.3rem, 0.6vw, 0.6rem) clamp(0.6rem, 1.2vw, 1.2rem);
+      font-family: var(--font-body);
+      font-style: italic;
+      font-size: var(--small-size);
+      color: #ffb547;
+    }
+
+    /* ===========================================
+       HIGHLIGHT / CALLOUT BOXES
+       =========================================== */
+    .callout {
+      background: rgba(255,255,255,0.06);
+      border-left: 3px solid var(--red);
+      border-radius: 0 6px 6px 0;
+      padding: clamp(0.6rem, 1.2vw, 1.2rem) clamp(0.8rem, 1.5vw, 1.5rem);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      color: rgba(255,255,255,0.8);
+      line-height: 1.5;
+    }
+    .callout--light {
+      background: rgba(4,0,102,0.05);
+      border-left-color: var(--red);
+      color: rgba(4,0,102,0.8);
+    }
+
+    /* Statistic highlight */
+    .stat-big {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: clamp(2.5rem, 7vw, 6rem);
+      color: var(--white);
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      color: rgba(255,255,255,0.6);
+      margin-top: 0.3em;
+    }
+
+    /* Red accent line (JAKALA divider) */
+    .red-divider {
+      width: clamp(40px, 6vw, 80px);
+      height: 3px;
+      background: var(--red);
+      margin: clamp(0.5rem, 1vw, 1rem) 0;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Progress bar -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Nav dots (generated by JS) -->
+  <nav class="nav-dots" id="navDots" aria-label="Navigazione slide"></nav>
+
+
+  <!-- ============================================================
+       SLIDE 1 — COVER
+       ============================================================ -->
+  <section class="slide slide--cover" aria-label="Slide 1: Cover">
+    <div class="hex hex--grey-tr"></div>
+    <div class="hex hex--red-br"></div>
+    <div class="hex hex--white-center"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="cover-eyebrow">Workshop AI Interno — Sessione 1</p>
+      <h1 class="cover-title">Manuale di sopravvivenza all'AI</h1>
+      <p class="cover-subtitle">Ecosistema · Prompt Engineering · Sfide Etiche</p>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Sara · Alberto · Gaia · Caterina</span>
+      <span>1 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 2 — SCALETTA
+       ============================================================ -->
+  <section class="slide slide--light" aria-label="Slide 2: Scaletta">
+    <div class="hex hex--blue-bl"></div>
+    <div class="logo-j logo-j--light"><span style="color:var(--blue-dark)">J</span>.</div>
+
+    <div class="agenda-layout">
+      <div class="agenda-left">
+        <div class="hex hex--grey-tr" style="opacity:0.15; width:200px; height:200px; top:-5%; right:-10%;"></div>
+        <h2 class="agenda-left-title">Scaletta</h2>
+        <p class="agenda-left-sub">~30' teoria · ~10' esercizio · ~10' confronto</p>
+      </div>
+      <div class="agenda-right">
+        <div class="agenda-item">
+          <div class="agenda-bullet"></div>
+          <div class="agenda-item-text"><strong>01 — Ecosistema AI & Consumi</strong>Cos'è l'AI, i player, quanto pesa un prompt</div>
+        </div>
+        <div class="agenda-item">
+          <div class="agenda-bullet"></div>
+          <div class="agenda-item-text"><strong>02 — Gestione dei File</strong>Quali formati dare all'AI e perché</div>
+        </div>
+        <div class="agenda-item">
+          <div class="agenda-bullet"></div>
+          <div class="agenda-item-text"><strong>03 — Prompt Optimization</strong>Le regole d'oro per prompt efficaci</div>
+        </div>
+        <div class="agenda-item">
+          <div class="agenda-bullet"></div>
+          <div class="agenda-item-text"><strong>04 — Generazioni Inclusive & Etica</strong>Bias, rappresentazione, responsabilità</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="slide-footer slide--light">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 2 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 3 — ROMPIGHIACCIO
+       ============================================================ -->
+  <section class="slide slide--dark" aria-label="Slide 3: Rompighiaccio">
+    <div class="hex hex--grey-tr" style="opacity:0.08;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Intro</p>
+      <h2 class="content-title">Prima di partire —</h2>
+      <p class="content-subtitle" style="font-size:var(--h3-size); color:rgba(255,255,255,0.85); font-weight:400;">
+        Alzate la mano: chi ha già usato un tool di AI al lavoro?<br>
+        <span style="color:rgba(255,255,255,0.5); font-size:var(--body-size);">ChatGPT · Copilot · Gemini · Midjourney · anche solo per un'email</span>
+      </p>
+      <div class="red-divider"></div>
+      <p class="content-subtitle">Questo non è un corso. È una conversazione tra pari.</p>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 3 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 4 — SEZIONE 01: ECOSISTEMA
+       ============================================================ -->
+  <section class="slide slide--section" aria-label="Slide 4: Sezione Ecosistema">
+    <div class="hex hex--grey-tr"></div>
+    <div class="hex hex--red-br" style="opacity:0.5;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="section-label">01</p>
+      <h2 class="section-title">Ecosistema AI & Consumi</h2>
+      <p class="section-desc">Cos'è l'AI, chi sono i player, quanto consuma un prompt</p>
+    </div>
+    <div class="section-number">01</div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 4 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 5 — ECOSISTEMA: CONTENUTO
+       ============================================================ -->
+  <section class="slide slide--dark" aria-label="Slide 5: Ecosistema AI">
+    <div class="hex hex--grey-tr" style="opacity:0.06;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Ecosistema AI</p>
+      <div class="two-col">
+        <div>
+          <h2 class="content-title" style="font-size:var(--h2-size);">AI Generativa</h2>
+          <p class="content-subtitle" style="margin-bottom:var(--item-gap);">Genera testo, immagini, codice, audio</p>
+          <ul class="bullet-list">
+            <li><strong>ChatGPT</strong> — OpenAI</li>
+            <li><strong>Claude</strong> — Anthropic</li>
+            <li><strong>Gemini</strong> — Google</li>
+            <li><strong>Copilot</strong> — Microsoft (Office)</li>
+            <li><strong>Midjourney / DALL·E</strong> — immagini</li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="content-title" style="font-size:var(--h2-size);">AI "Classica"</h2>
+          <p class="content-subtitle" style="margin-bottom:var(--item-gap);">Riconosce pattern, fa previsioni, filtra</p>
+          <ul class="bullet-list">
+            <li>Filtro antispam nella tua email</li>
+            <li>Algoritmo di raccomandazione Netflix</li>
+            <li>Face ID dello smartphone</li>
+            <li>Traduzione automatica</li>
+          </ul>
+          <div class="callout" style="margin-top:var(--content-gap);">Già la usate da anni — senza saperlo</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 5 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 6 — COME FUNZIONA L'AI GENERATIVA
+       ============================================================ -->
+  <section class="slide slide--dark" aria-label="Slide 6: Come funziona l'AI">
+    <div class="hex hex--grey-tr" style="opacity:0.06;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Ecosistema AI</p>
+      <h2 class="content-title">Come funziona? In parole semplici.</h2>
+      <div class="two-col">
+        <div>
+          <p class="content-subtitle">
+            ChatGPT, Claude, Gemini — sono tutti modelli addestrati su quantità enormi di testo: libri, articoli, siti web, codice.
+          </p>
+          <p class="content-subtitle">
+            Non "pensano" come noi. Predicono quale parola viene dopo, in modo statisticamente probabile — ma sono straordinariamente bravi a sembrare intelligenti.
+          </p>
+        </div>
+        <div>
+          <div class="callout" style="margin-bottom:var(--item-gap);">
+            <strong>Analogia:</strong> è come un autocomplete avanzatissimo che ha letto tutto internet — e sa quando fare le domande giuste.
+          </div>
+          <ul class="bullet-list">
+            <li>Non ha coscienza, non "capisce" davvero</li>
+            <li>Può sbagliare — e farlo con sicurezza</li>
+            <li>Il contesto che gli date cambia tutto</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 6 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 7 — CONSUMI: QUANTO PESA UN PROMPT?
+       ============================================================ -->
+  <section class="slide slide--dark" aria-label="Slide 7: Consumi AI">
+    <div class="hex hex--grey-tr" style="opacity:0.07;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Sostenibilità & Consumi</p>
+      <h2 class="content-title">Quanto pesa un prompt?</h2>
+      <div class="two-col">
+        <div style="display:flex; flex-direction:column; gap:var(--item-gap);">
+          <div class="format-row format-row--ok">
+            <span class="format-tag">Prompt</span>
+            <span class="format-desc">~5–10× una ricerca Google. Molto meno del previsto.</span>
+          </div>
+          <div class="format-row format-row--warn">
+            <span class="format-tag">Modelli</span>
+            <span class="format-desc">Training iniziale = energia significativa. Inference = molto meno.</span>
+          </div>
+          <div class="format-row format-row--bad">
+            <span class="format-tag">Scala</span>
+            <span class="format-desc">Miliardi di richieste/giorno: il volume fa la differenza.</span>
+          </div>
+        </div>
+        <div>
+          <p class="content-subtitle">Prompt ben scritti = output migliore + minor spreco di computazione.</p>
+          <div class="callout" style="margin-top:var(--content-gap);">
+            📄 Fonte: SciTechDaily — <em>"Study debunks major myth: AI's energy usage is significantly less than feared"</em>
+          </div>
+          <p class="placeholder" style="margin-top:var(--item-gap);">[ Dato preciso consumo energetico da aggiungere ]</p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 7 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 8 — QUIZ 2: QUANTO CONSUMA?
+       ============================================================ -->
+  <section class="slide slide--quiz" aria-label="Slide 8: Quiz consumi">
+    <div class="hex hex--red-br" style="opacity:0.25;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Quiz · Consumi</p>
+      <p class="quiz-question">Un prompt a ChatGPT consuma circa quanto…?</p>
+      <div class="quiz-options">
+        <div class="quiz-opt"><span class="quiz-letter">A</span>☕ Fare un caffè espresso</div>
+        <div class="quiz-opt"><span class="quiz-letter">B</span>🔍 5–10 ricerche Google (non 1.000)</div>
+        <div class="quiz-opt"><span class="quiz-letter">C</span>✈️ Volare da Milano a New York</div>
+      </div>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 8 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 9 — SEZIONE 02: GESTIONE FILE
+       ============================================================ -->
+  <section class="slide slide--section" aria-label="Slide 9: Sezione File">
+    <div class="hex hex--grey-tr"></div>
+    <div class="hex hex--red-br" style="opacity:0.4;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="section-label">02</p>
+      <h2 class="section-title">Gestione dei File</h2>
+      <p class="section-desc">Cosa dare da mangiare all'AI — e in che formato</p>
+    </div>
+    <div class="section-number">02</div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 9 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 10 — FORMATI FILE
+       ============================================================ -->
+  <section class="slide slide--dark" aria-label="Slide 10: Formati file">
+    <div class="hex hex--grey-tr" style="opacity:0.06;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Gestione dei File</p>
+      <h2 class="content-title">L'AI non "legge" — elabora testo</h2>
+      <p class="content-subtitle">Il formato conta. Più è pulito, meglio funziona.</p>
+      <div class="format-table">
+        <div class="format-row format-row--ok">
+          <span class="format-tag">✅ .md .txt .csv</span>
+          <span class="format-desc">Ottimali — testo puro e strutturato, nessun rumore</span>
+        </div>
+        <div class="format-row format-row--warn">
+          <span class="format-tag">⚠️ .pdf .docx</span>
+          <span class="format-desc">Accettabili se non protetti — occhio alla formattazione complessa</span>
+        </div>
+        <div class="format-row format-row--bad">
+          <span class="format-tag">❌ PDF scansionati</span>
+          <span class="format-desc">Per l'AI sono immagini — elaborazione scarsa o nulla</span>
+        </div>
+        <div class="format-row format-row--bad">
+          <span class="format-tag">❌ .xlsx con formule</span>
+          <span class="format-desc">La logica nascosta nelle formule non è visibile all'AI</span>
+        </div>
+      </div>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 10 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 11 — QUIZ 3: FILE .MD
+       ============================================================ -->
+  <section class="slide slide--quiz" aria-label="Slide 11: Quiz file .md">
+    <div class="hex hex--red-br" style="opacity:0.3;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Quiz · File</p>
+      <p class="quiz-question">Sapete cos'è un file .md?</p>
+      <div class="quiz-options">
+        <div class="quiz-opt"><span class="quiz-letter">A</span>⚙️ Un file di log di sistema</div>
+        <div class="quiz-opt"><span class="quiz-letter">B</span>🗄️ Un formato proprietario per database relazionali</div>
+        <div class="quiz-opt"><span class="quiz-letter">C</span>📝 Markdown — formato di testo puro con sintassi leggera</div>
+      </div>
+      <p class="content-subtitle" style="margin-top:var(--content-gap); font-size:var(--small-size); color:rgba(255,255,255,0.4);">
+        Approfondimento → medium.com — "Why Markdown became the working language of AI"
+      </p>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 11 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 12 — SEZIONE 03: PROMPT OPTIMIZATION
+       ============================================================ -->
+  <section class="slide slide--section" aria-label="Slide 12: Sezione Prompt">
+    <div class="hex hex--grey-tr"></div>
+    <div class="hex hex--red-br" style="opacity:0.4;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="section-label">03</p>
+      <h2 class="section-title">Prompt Optimization</h2>
+      <p class="section-desc">Come smettere di parlare all'AI come a un motore di ricerca</p>
+    </div>
+    <div class="section-number">03</div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 12 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 13 — PROMPT PESSIMO (interattivo)
+       ============================================================ -->
+  <section class="slide slide--dark" aria-label="Slide 13: Prompt pessimo">
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Il problema</p>
+      <h2 class="content-title">Questo prompt… cosa manca?</h2>
+      <div class="prompt-box prompt-box--bad" style="max-width:min(90%, 700px); margin-bottom:var(--content-gap);">
+        <span class="prompt-box-label">❌ Prompt Reale</span>
+        <code class="prompt-code">"fammi una presentazione sull'AI"</code>
+        <p class="prompt-result">Output: generico, inutile, 10 slide vuote</p>
+      </div>
+      <p class="content-subtitle">Ditecelo voi — cosa aggiungereste?</p>
+      <ul class="bullet-list" style="margin-top:var(--item-gap);">
+        <li>A chi è rivolta?</li>
+        <li>Quante slide? Che formato?</li>
+        <li>Che tono? Che obiettivo?</li>
+        <li>Cosa sa già il pubblico?</li>
+      </ul>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 13 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 14 — REGOLE D'ORO
+       ============================================================ -->
+  <section class="slide slide--light" aria-label="Slide 14: Regole d'oro">
+    <div class="hex hex--blue-bl"></div>
+    <div class="logo-j logo-j--light"><span style="color:var(--blue-dark)">J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label" style="color:var(--red);">Prompt Optimization</p>
+      <h2 class="content-title" style="color:var(--blue-dark);">Le regole d'oro</h2>
+      <div class="two-col">
+        <ul class="bullet-list bullet-list--light">
+          <li><strong>Dai un RUOLO all'AI</strong><br><span style="font-size:var(--small-size);">"Sei un copywriter senior nel settore fintech…"</span></li>
+          <li><strong>Specifica il CONTESTO</strong><br><span style="font-size:var(--small-size);">Chi legge? Qual è l'obiettivo? Cosa già sa?</span></li>
+          <li><strong>Definisci il FORMATO</strong><br><span style="font-size:var(--small-size);">Lista, paragrafo, tabella, bullet, tono…</span></li>
+        </ul>
+        <ul class="bullet-list bullet-list--light">
+          <li><strong>Dai ESEMPI</strong><br><span style="font-size:var(--small-size);">Mostra un esempio di output desiderato</span></li>
+          <li><strong>ITERA</strong><br><span style="font-size:var(--small-size);">Non è un oracolo — è una conversazione. Correggi e migliora.</span></li>
+          <li class="placeholder" style="border-left:none; padding:0; background:none;">[ Da integrare con PDF p.12 + p.15-16 ]</li>
+        </ul>
+      </div>
+    </div>
+
+    <footer class="slide-footer slide--light">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 14 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 15 — PRIMA / DOPO
+       ============================================================ -->
+  <section class="slide slide--dark" aria-label="Slide 15: Prima Dopo">
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Prompt in pratica</p>
+      <h2 class="content-title">La differenza è nel dettaglio</h2>
+      <div class="prompt-compare">
+        <div class="prompt-box prompt-box--bad">
+          <span class="prompt-box-label">❌ Prima</span>
+          <code class="prompt-code">"scrivi un'email al cliente"</code>
+          <p class="prompt-result">Output: generico, tono sbagliato, senza contesto</p>
+        </div>
+        <div class="prompt-box prompt-box--good">
+          <span class="prompt-box-label">✅ Dopo</span>
+          <code class="prompt-code">"Sei un account manager in un'agenzia digitale.
+Scrivi un'email professionale ma cordiale
+a un cliente (CFO di una PMI manifatturiera)
+per comunicare uno slittamento di 2 settimane
+nella consegna del progetto X.
+Tono: diretto, senza scuse eccessive.
+Formato: max 150 parole, oggetto incluso."</code>
+          <p class="prompt-result">Output: utilizzabile al 90% senza modifiche</p>
+        </div>
+      </div>
+      <p class="placeholder" style="margin-top:var(--content-gap);">[ Esempio reale da PDF p.18 da aggiungere ]</p>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 15 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 16 — STRUTTURE AVANZATE (PLACEHOLDER)
+       ============================================================ -->
+  <section class="slide slide--dark" aria-label="Slide 16: Strutture avanzate">
+    <div class="hex hex--grey-tr" style="opacity:0.06;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Prompt Avanzato</p>
+      <h2 class="content-title">Strutture e tecniche avanzate</h2>
+      <p class="placeholder" style="display:block; margin-bottom:var(--content-gap);">[ Contenuto da PDF slide_ai_prompt_design p.20–21–22 ]</p>
+      <ul class="bullet-list">
+        <li>Chain-of-thought prompting</li>
+        <li>Few-shot examples</li>
+        <li>System prompt vs user prompt</li>
+        <li class="placeholder" style="border:none; background:none; padding:0;">[ Altri punti da p.20–22 ]</li>
+      </ul>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 16 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 17 — CAVEMAN
+       ============================================================ -->
+  <section class="slide slide--dark" aria-label="Slide 17: Caveman">
+    <div class="hex hex--red-br" style="opacity:0.2;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Tool Spotlight</p>
+      <h2 class="content-title">Caveman</h2>
+      <p class="content-subtitle" style="font-size:var(--h3-size); font-style:italic; color:rgba(255,255,255,0.9);">
+        "Why use many token when few token do trick?"
+      </p>
+      <div class="red-divider"></div>
+      <ul class="bullet-list" style="margin-top:var(--item-gap);">
+        <li>Tool open source che comprime le risposte dell'AI</li>
+        <li>Risparmio token: <strong>30–65%</strong> senza perdere qualità</li>
+        <li>Comprime l'output, non il tuo prompt</li>
+        <li>Utile per agenti AI e flussi automatizzati</li>
+      </ul>
+      <p class="content-subtitle" style="margin-top:var(--content-gap); font-size:var(--small-size); color:rgba(255,255,255,0.4);">
+        github.com/JuliusBrussee/caveman · Sessione 2: demo live con agenti
+      </p>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 17 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 18 — SEZIONE 04: INCLUSIVITÀ
+       ============================================================ -->
+  <section class="slide slide--section" aria-label="Slide 18: Sezione Inclusività">
+    <div class="hex hex--grey-tr"></div>
+    <div class="hex hex--red-br" style="opacity:0.4;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="section-label">04</p>
+      <h2 class="section-title">Generazioni Inclusive & Etica</h2>
+      <p class="section-desc">L'AI non è neutrale — e guidarla è una responsabilità</p>
+    </div>
+    <div class="section-number">04</div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 18 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 19 — L'AI NON È NEUTRALE
+       ============================================================ -->
+  <section class="slide slide--dark" aria-label="Slide 19: AI non neutrale">
+    <div class="hex hex--grey-tr" style="opacity:0.06;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Generazioni Inclusive</p>
+      <h2 class="content-title">L'AI non è neutrale</h2>
+      <div class="two-col">
+        <div>
+          <p class="content-subtitle">È addestrata su dati prodotti da esseri umani — con tutti i loro bias, pregiudizi, lacune.</p>
+          <p class="content-subtitle">Quei bias si riproducono nell'output se non stiamo attenti.</p>
+          <p class="placeholder" style="margin-top:var(--item-gap);">[ Contenuto da PDF p.23–24–25 ]</p>
+        </div>
+        <div>
+          <div class="callout">
+            Un output che esclude metà del pubblico è un output <strong>sbagliato</strong> — non solo poco etico.
+          </div>
+          <p class="placeholder" style="margin-top:var(--content-gap);">[ Schema bias da slide_ai_inclusivity p.9 ]</p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 19 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 20 — VIDEO: PASOLINI / UNGARETTI
+       ============================================================ -->
+  <section class="slide slide--video" aria-label="Slide 20: Video Pasolini">
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content" style="align-items:center; gap:var(--content-gap);">
+      <p class="content-label" style="text-align:center;">1964 — Pier Paolo Pasolini</p>
+      <h2 class="content-title" style="text-align:center; font-size:var(--h2-size);">Comizi d'Amore</h2>
+      <p class="content-subtitle" style="text-align:center; margin-bottom:var(--content-gap);">
+        Pasolini chiede agli italiani domande scomode.<br>
+        <span style="font-size:var(--small-size); color:rgba(255,255,255,0.4);">Durata clip: ~2 min</span>
+      </p>
+      <div class="video-frame">
+        <iframe
+          src="https://www.youtube.com/embed/A5-kvHUcJw8"
+          title="Pasolini — Comizi d'Amore (Ungaretti)"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 20 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 21 — DOPO IL VIDEO: RIFLESSIONE
+       ============================================================ -->
+  <section class="slide slide--dark" aria-label="Slide 21: Riflessione post video">
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Riflessione</p>
+      <h2 class="content-title">Avete notato qualcosa?</h2>
+      <div class="two-col">
+        <div>
+          <p class="content-subtitle">Nelle risposte, nelle reazioni, in chi Pasolini sceglieva di intervistare…</p>
+          <p class="content-subtitle">Ora immaginate di chiedere le stesse cose a ChatGPT. Chi rappresenta? Chi esclude?</p>
+        </div>
+        <div>
+          <p class="placeholder" style="display:block; margin-bottom:var(--content-gap);">[ Contenuto da slide_ai_inclusivity p.11–12–14 ]</p>
+          <ul class="bullet-list">
+            <li>Come guidare l'AI verso output più rappresentativi</li>
+            <li>Prompt inclusivi: specificare diversità esplicitamente</li>
+            <li>Verificare sempre chi manca dalla risposta</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 21 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 22 — ESERCIZIO: MANI IN PASTA
+       ============================================================ -->
+  <section class="slide slide--exercise" aria-label="Slide 22: Esercizio">
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <span class="exercise-tag">⚡ Mani in pasta</span>
+      <h2 class="content-title" style="font-size:var(--h2-size);">Adesso tocca a voi</h2>
+      <p class="content-subtitle">Pensate a un task reale del vostro lavoro.</p>
+      <ul class="bullet-list" style="margin-top:var(--item-gap); max-width:min(90%,650px);">
+        <li><strong>Step 1</strong> — Scrivete il prompt come lo scrivereste adesso, istintivamente</li>
+        <li><strong>Step 2</strong> — Riscrivetelo applicando le regole d'oro (ruolo, contesto, formato)</li>
+        <li><strong>Step 3</strong> — Confrontate i due output</li>
+      </ul>
+      <p class="exercise-timer">⏱ <span>7 minuti</span> — poi condividiamo</p>
+    </div>
+    <div class="exercise-number">⚡</div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 22 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 23 — Q&A / CONFRONTO APERTO
+       ============================================================ -->
+  <section class="slide slide--dark" aria-label="Slide 23: Confronto aperto">
+    <div class="hex hex--grey-tr" style="opacity:0.06;"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <p class="content-label">Confronto aperto · 10 min</p>
+      <h2 class="content-title">Cosa vi ha sorpreso?</h2>
+      <div class="two-col">
+        <div style="display:flex; flex-direction:column; gap:var(--item-gap);">
+          <div class="callout">💬 Cosa portereste a casa già domani?</div>
+          <div class="callout">🤔 C'è qualcosa che vi ha fatto cambiare idea?</div>
+          <div class="callout">🚀 Cosa volete esplorare nella prossima sessione?</div>
+        </div>
+        <div>
+          <p class="content-label" style="margin-bottom:var(--item-gap);">Approfondimento</p>
+          <ul class="bullet-list">
+            <li>🔗 OpenAI Tokenizer — platform.openai.com/tokenizer</li>
+            <li>🔗 GitHub Caveman — github.com/JuliusBrussee/caveman</li>
+            <li>🔗 SciTechDaily — AI energy usage</li>
+            <li>🔗 The Bunker — AI vs attività quotidiane</li>
+            <li>🔗 Case study inclusività (link → slide separata)</li>
+          </ul>
+          <p class="content-subtitle" style="margin-top:var(--content-gap); font-size:var(--small-size); color:rgba(255,255,255,0.4);">
+            Sessione 2 → Agenti AI · Automazioni · Caveman in azione
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 23 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE 24 — GRAZIE
+       ============================================================ -->
+  <section class="slide slide--thanks" aria-label="Slide 24: Grazie">
+    <div class="hex hex--grey-tr"></div>
+    <div class="hex hex--red-br"></div>
+    <div class="hex hex--white-center"></div>
+    <div class="logo-j logo-j--dark"><span>J</span>.</div>
+
+    <div class="slide-content">
+      <h1 class="thanks-title">Grazie!</h1>
+      <p class="thanks-sub">Il miglior modo per imparare l'AI è usarla — anche male. Soprattutto male, all'inizio.</p>
+      <div class="red-divider"></div>
+      <div class="oratori-row">
+        <span class="oratore"><span>·</span> Sara</span>
+        <span class="oratore"><span>·</span> Alberto</span>
+        <span class="oratore"><span>·</span> Gaia</span>
+        <span class="oratore"><span>·</span> Caterina</span>
+      </div>
+      <p class="content-subtitle" style="margin-top:var(--content-gap); font-size:var(--small-size); color:rgba(255,255,255,0.4);">
+        Sessione 2 in arrivo — Agenti AI & Automazioni
+      </p>
+    </div>
+
+    <footer class="slide-footer slide--dark">
+      <span>Workshop AI Interno</span>
+      <span>Sessione 1 · 23 / 24</span>
+    </footer>
+  </section>
+
+
+  <!-- ============================================================
+       SLIDE PRESENTATION CONTROLLER (no animations)
+       ============================================================ -->
+  <script>
+    class SlidePresentation {
+      constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.totalSlides = this.slides.length;
+        this.currentSlide = 0;
+
+        this.setupProgressBar();
+        this.setupNavDots();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupScrollObserver();
+      }
+
+      // --- Progress bar ---
+      setupProgressBar() {
+        this.progressBar = document.getElementById('progressBar');
+        this.updateProgress();
+      }
+
+      updateProgress() {
+        const pct = ((this.currentSlide) / (this.totalSlides - 1)) * 100;
+        this.progressBar.style.width = pct + '%';
+      }
+
+      // --- Nav dots ---
+      setupNavDots() {
+        this.navDotsEl = document.getElementById('navDots');
+        this.slides.forEach((slide, i) => {
+          const btn = document.createElement('button');
+          btn.className = 'nav-dot' + (i === 0 ? ' active' : '');
+          btn.setAttribute('aria-label', 'Vai alla slide ' + (i + 1));
+          btn.addEventListener('click', () => this.goToSlide(i));
+          this.navDotsEl.appendChild(btn);
+        });
+        this.dots = this.navDotsEl.querySelectorAll('.nav-dot');
+      }
+
+      updateDots() {
+        this.dots.forEach((d, i) => {
+          d.classList.toggle('active', i === this.currentSlide);
+        });
+      }
+
+      // --- Navigation ---
+      goToSlide(index) {
+        if (index < 0 || index >= this.totalSlides) return;
+        this.currentSlide = index;
+        this.slides[index].scrollIntoView({ behavior: 'smooth' });
+        this.updateProgress();
+        this.updateDots();
+      }
+
+      next() { this.goToSlide(this.currentSlide + 1); }
+      prev() { this.goToSlide(this.currentSlide - 1); }
+
+      // --- Keyboard ---
+      setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+            e.preventDefault(); this.next();
+          } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+            e.preventDefault(); this.prev();
+          } else if (e.key === 'Home') {
+            e.preventDefault(); this.goToSlide(0);
+          } else if (e.key === 'End') {
+            e.preventDefault(); this.goToSlide(this.totalSlides - 1);
+          }
+        });
+      }
+
+      // --- Touch/swipe ---
+      setupTouchNav() {
+        let startY = 0, startX = 0;
+        document.addEventListener('touchstart', (e) => {
+          startY = e.touches[0].clientY;
+          startX = e.touches[0].clientX;
+        }, { passive: true });
+        document.addEventListener('touchend', (e) => {
+          const dy = startY - e.changedTouches[0].clientY;
+          const dx = startX - e.changedTouches[0].clientX;
+          if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 40) {
+            dy > 0 ? this.next() : this.prev();
+          }
+        }, { passive: true });
+      }
+
+      // --- Intersection observer: track current slide ---
+      setupScrollObserver() {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+              const idx = Array.from(this.slides).indexOf(entry.target);
+              if (idx !== -1 && idx !== this.currentSlide) {
+                this.currentSlide = idx;
+                this.updateProgress();
+                this.updateDots();
+              }
+            }
+          });
+        }, { threshold: 0.5 });
+
+        this.slides.forEach(slide => observer.observe(slide));
+      }
+    }
+
+    new SlidePresentation();
+  </script>
+</body>
+</html>
