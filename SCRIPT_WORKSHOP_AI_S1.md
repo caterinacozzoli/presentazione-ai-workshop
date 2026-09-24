@@ -206,48 +206,43 @@
 
 ---
 
-## SLIDE 14 — LE REGOLE D'ORO
-> **[schermo]** Due colonne con 5 regole:
-> 1. Assegna un RUOLO | 2. Fornisci CONTESTO | 3. Definisci il FORMATO | 4. Dai ESEMPI | 5. ITERA
-> `[PLACEHOLDER: da integrare con PDF p.12 + p.15-16]`
+## SLIDE 14 — LE REGOLE D'ORO E IL MINDSET
+> **[schermo]** 6 regole per il Prompt Design:
+> 1. Definisci l'obiettivo | 2. Itera e raffina | 3. Usa l'AI come copilota | 4. Adotta un mindset innovativo | 5. Valuta i risultati | 6. Mantieni flessibilità
 
-**SARA:** Esistono cinque principi cardine per costruire un prompt solido.
+**SARA:** Un agente AI è un sistema autonomo capace di percepire l'ambiente, pianificare e prendere decisioni. Per guidarlo serve un approccio consapevole.
 
-**ALBERTO:** Il primo è fondamentale: assegnare un ruolo. "Agisci come un analista di mercato senior" configura immediatamente il livello linguistico e la profondità dell'analisi. 
+**ALBERTO:** Esistono regole fondamentali: definire chiaramente l'obiettivo, assegnando contesto e dettagli; usare l'AI come un "copilota" e non come un sostituto; e soprattutto adottare una mentalità innovativa, evitando di replicare ciecamente processi tradizionali.
 
-**SARA:** L'ultimo passaggio è altrettanto cruciale: l'iterazione. L'AI non deve produrre il risultato perfetto al primo colpo; è un processo conversazionale in cui si raffina la richiesta progressivamente.
-
-**`[PLACEHOLDER: integrare regole specifiche da slide_ai_prompt_design p.12 + p.15-16]`**
+**SARA:** E infine, l'iterazione e la verifica. I modelli generativi non sono deterministici: è fondamentale valutare sempre se i risultati contengono bias o inesattezze e raffinare progressivamente la richiesta.
 
 **[slide →]**
 
 ---
 
 ## SLIDE 15 — PRIMA / DOPO
-> **[schermo]** Confronto due colonne:
-> ❌ Prima: "Scrivi un'email di aggiornamento al cliente"
-> ✅ Dopo: Prompt strutturato con Ruolo, Contesto, Obiettivo, Formato e Vincoli
-> `[PLACEHOLDER: esempio reale da p.18 da aggiungere]`
+> **[schermo]** Quattro tipi di prompt:
+> 1. Informativi (per risposte e sintesi)
+> 2. Generativi (per idee creative e narrazioni)
+> 3. Analitici (per liste e tabelle)
+> 4. Role-Based (assegnare un ruolo per risultati contestuali)
 
-**CATERINA:** Vediamo un confronto applicato a un caso d'uso quotidiano.
+**CATERINA:** Vediamo un confronto applicato ai nostri flussi quotidiani. Possiamo variare tipologia: dai prompt informativi a quelli analitici, fino a quelli basati sui ruoli, come "Agisci come un cliente altospendente".
 
-*(pausa — il pubblico legge i due prompt)*
+*(pausa — il pubblico osserva lo schema)*
 
 **GAIA:** Investire due minuti per strutturare bene la richiesta vi restituisce un testo che richiederà solo minimi aggiustamenti, anziché doverlo riscrivere da capo.
-
-**`[PLACEHOLDER: aggiungere esempio da slide_ai_prompt_design p.18]`**
 
 **[slide →]**
 
 ---
 
 ## SLIDE 16 — STRUTTURE AVANZATE
-> **[schermo]** `[PLACEHOLDER: contenuto da slide_ai_prompt_design p.20-21-22 riformulato]`
-> Bullet: Pensiero logico (Chain-of-thought) | Esempi guidati (Few-shot)
+> **[schermo]** Regole avanzate: Usa frasi affermative | Metti in evidenza i punti chiave | Usa i vincoli (constraints) | Chiedi all'AI di farti domande (reverse prompting) | Chiedi opzioni multiple | Usa il Few-shot learning
 
 **SARA:** Quando le attività diventano più complesse, possiamo usare tecniche avanzate per guidare il ragionamento della macchina.
 
-**ALBERTO:** `[PLACEHOLDER: script da costruire dopo lettura PDF p.20-21-22]`
+**ALBERTO:** Invece di descrivere solo il compito, possiamo fornire esempi reali di input e output (few-shot learning) o imporre vincoli precisi. È anche molto utile chiedere all'AI di farci delle domande prima di rispondere, se mancano dettagli fondamentali.
 
 **[slide →]**
 
@@ -276,16 +271,16 @@
 
 ---
 
-## SLIDE 19 — L'AI NON È NEUTRALE
+## SLIDE 19 — L'AI NON È NEUTRALE E L'INCLUSIVE DESIGN
 > **[schermo]** Due colonne:
-> Sinistra: testo — "I modelli riflettono i dati umani, inclusi stereotipi e pregiudizi storici."
-> Destra: Callout "L'impatto dei bias sui risultati aziendali e comunicativi" + `[PLACEHOLDER: schema bias da slide_ai_inclusivity p.9]`
+> Sinistra: testo — "L'Inclusive Design non significa progettare una sola cosa per tutte le persone. Significa progettare una varietà di modalità di partecipazione."
+> Destra: Callout "L'impatto dei bias sui risultati aziendali e comunicativi e l'uso di Prompt Strutturati (Medium + Subject + Details + Parameters)"
 
 **GAIA:** Chiudiamo con un aspetto di estrema rilevanza professionale ed etica: la presunta "neutralità" della tecnologia.
 
-**CATERINA:** I modelli AI sono stati addestrati su una fotografia del mondo reale, che contiene inevitabilmente pregiudizi, stereotipi storici e squilibri. Di default, la macchina tenderà a riproporli.
+**CATERINA:** I modelli AI sono stati addestrati su una fotografia del mondo reale, che contiene inevitabilmente pregiudizi, stereotipi storici e squilibri. Di default, la macchina tenderà a riproporli. L'Inclusive Design non impone un'unica soluzione, ma abbraccia molteplici varianti affinché tutti si sentano parte integrante.
 
-**GAIA:** `[PLACEHOLDER: contenuto da slide_ai_prompt_design p.23-24-25 + slide_ai_inclusivity p.9]`
+**GAIA:** Quando generiamo immagini, per esempio, se non specifichiamo i dettagli l'AI ricadrà nei suoi bias di base. È vitale strutturare i prompt visivi specificando il Mezzo, il Soggetto, i Dettagli e i Parametri, utilizzando descrittori inclusivi per età, genere ed etnia per rappresentare la bellezza reale e diversificata.
 
 **CATERINA:** Nel nostro lavoro, produrre output stereotipati significa fallire in termini di qualità e inclusività. Abbiamo la responsabilità di guidare la macchina con prompt espliciti.
 
@@ -308,9 +303,8 @@
 ---
 
 ## SLIDE 21 — DOPO IL VIDEO: RIFLESSIONE
-> **[schermo]** "Riflessione sui campioni di dati"
-> Due domande: "Chi era rappresentato?" / "Come l'AI avrebbe mediato queste prospettive?"
-> `[PLACEHOLDER: contenuto da slide_ai_inclusivity p.11-12-14]`
+> **[schermo]** "Riflessione sui campioni di dati: Soddisfare le esigenze reali, non solo il maggior numero di utenti"
+> "Diversità Interne ed Esterne: Genere, Abilità, Età, Cultura, Reddito, Istruzione"
 
 **GAIA:** Notate come la selezione degli intervistati e la formulazione delle domande influenzino profondamente il quadro che emerge?
 
@@ -318,7 +312,7 @@
 
 **CATERINA:** Se chiedessimo oggi a un'AI di sintetizzare l'opinione pubblica su temi complessi, il rischio è ottenere la voce della "maggioranza statistica" presente nei suoi dati di addestramento, silenziando altre prospettive.
 
-**SARA:** `[PLACEHOLDER: contenuto da slide_ai_inclusivity p.11-12-14]`
+**SARA:** L'obiettivo della progettazione inclusiva, come ci insegna l'Inclusive Design, è soddisfare il maggior numero possibile di "esigenze reali" degli utenti, non solo la massa. Dobbiamo considerare sia le diversità interne come l'abilità o l'età, sia quelle esterne come il reddito o l'istruzione.
 
 **ALBERTO:** Esserne consapevoli ci permette di inserire vincoli precisi nei nostri prompt per ottenere risultati bilanciati e professionali.
 
